@@ -3,7 +3,10 @@ package cn.smilex.telegram.message.bot.api;
 import cn.smilex.req.HttpRequest;
 import cn.smilex.req.HttpResponse;
 import cn.smilex.req.Requests;
+import cn.smilex.telegram.message.bot.entity.ReqSendMessage;
+import cn.smilex.telegram.message.bot.util.CommonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import static cn.smilex.telegram.message.bot.util.CommonUtil.OBJECT_MAPPER;
  * @since 1.0
  */
 @Slf4j
+@Getter
 public class TelegramBot {
 
     private static final int MESSAGE_LEN = 4096;
@@ -30,19 +34,46 @@ public class TelegramBot {
         this.baseApiUrl = String.format("https://api.telegram.org/bot%s/", key);
     }
 
-    private HttpRequest createSendMessageRequest(Integer chatId, String message) {
-        return HttpRequest.build()
+    public HttpRequest createSendMessageRequest(Integer chatId, String message) {
+        return createSendMessageRequest(
+                chatId,
+                message,
+                null
+        );
+    }
+
+    private HttpRequest createSendMessageRequest(ReqSendMessage reqSendMessage) {
+        return createSendMessageRequest(
+                reqSendMessage.getChatId(),
+                reqSendMessage.getMessage(),
+                reqSendMessage.getParseMode()
+        );
+    }
+
+    public HttpRequest createSendMessageRequest(Integer chatId, String message, Integer messageType) {
+
+        HttpRequest httpRequest = HttpRequest.build()
                 .setUrl(this.baseApiUrl + "sendMessage")
                 .setMethod(Requests.REQUEST_METHOD.POST)
                 .addParam("chat_id", String.valueOf(chatId))
                 .addParam("text", message);
+
+        String parseMode;
+        if ((parseMode = CommonUtil.parseTelegramBotMessageType(messageType)) != null) {
+            httpRequest.addParam("parse_mode", parseMode);
+        }
+
+        return httpRequest;
     }
 
-    public List<Boolean> sendMessage(Integer chatId, String message) {
+    public List<Boolean> sendMessage(ReqSendMessage reqSendMessage) {
         List<Boolean> result = new ArrayList<>();
 
-        if (message.length() <= 4096) {
-            result.add(sendMessage(createSendMessageRequest(chatId, message)));
+        final String message = reqSendMessage.getMessage();
+        final Integer chatId = reqSendMessage.getChatId();
+
+        if (message.length() <= MESSAGE_LEN) {
+            result.add(sendMessage(createSendMessageRequest(reqSendMessage)));
         } else {
             final int len = message.length();
             final int count = len / MESSAGE_LEN;
