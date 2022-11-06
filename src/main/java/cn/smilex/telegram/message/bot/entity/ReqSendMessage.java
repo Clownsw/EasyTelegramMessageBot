@@ -15,4 +15,5 @@ import lombok.NoArgsConstructor;
 public class ReqSendMessage {
     private Integer chatId;
     private String message;
+    private Integer parseMode;
 }

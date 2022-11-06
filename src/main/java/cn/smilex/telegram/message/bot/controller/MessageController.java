@@ -33,6 +33,6 @@ public class MessageController {
     public void send(@RequestBody ReqSendMessage message) {
         Thread.ofVirtual()
                 .start(() -> commonBeanConfig.telegramBot()
-                        .sendMessage(message.getChatId(), message.getMessage()));
+                        .sendMessage(message));
     }
 }
