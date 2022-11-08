@@ -1,6 +1,5 @@
 package cn.smilex.telegram.message.bot.util;
 
-import cn.smilex.telegram.message.bot.api.TelegramBotMessageType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
@@ -19,20 +18,5 @@ public final class CommonUtil {
     @SneakyThrows
     public static <T> String toJsonStr(T t) {
         return OBJECT_MAPPER.writeValueAsString(t);
-    }
-
-    public static String parseTelegramBotMessageType(Integer value) {
-        if (value == null) {
-            return null;
-        }
-
-        TelegramBotMessageType[] values = TelegramBotMessageType.values();
-        for (TelegramBotMessageType telegramBotMessageType : values) {
-            if (value.equals(telegramBotMessageType.getValue())) {
-                return telegramBotMessageType.name();
-            }
-        }
-
-        return null;
     }
 }

@@ -3,6 +3,7 @@ package cn.smilex.telegram.message.bot.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 /**
  * @author smilex
@@ -13,7 +14,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReqSendMessage {
-    private Integer chatId;
-    private String message;
-    private Integer parseMode;
+    private Long chatId;
+    private String text;
+    private String parseMode;
+
+    public SendMessage intoSendMessage() {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(this.chatId);
+        sendMessage.setText(this.text);
+        sendMessage.setParseMode(this.parseMode);
+        return sendMessage;
+    }
 }

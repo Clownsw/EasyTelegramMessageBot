@@ -1,12 +1,13 @@
 package cn.smilex.telegram.message.bot.controller;
 
-import cn.smilex.telegram.message.bot.config.CommonBeanConfig;
 import cn.smilex.telegram.message.bot.entity.ReqSendMessage;
+import cn.smilex.telegram.message.bot.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 /**
  * @author smilex
@@ -17,11 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MessageController {
 
-    private CommonBeanConfig commonBeanConfig;
+    private MessageService messageService;
 
     @Autowired
-    public void setCommonBeanConfig(CommonBeanConfig commonBeanConfig) {
-        this.commonBeanConfig = commonBeanConfig;
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
     }
 
     /**
@@ -31,8 +32,6 @@ public class MessageController {
      */
     @PostMapping("/send")
     public void send(@RequestBody ReqSendMessage message) {
-        Thread.ofVirtual()
-                .start(() -> commonBeanConfig.telegramBot()
-                        .sendMessage(message));
+        messageService.sendMessage(message);
     }
 }

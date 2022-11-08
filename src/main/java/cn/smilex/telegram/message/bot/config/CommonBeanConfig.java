@@ -1,9 +1,12 @@
 package cn.smilex.telegram.message.bot.config;
 
-import cn.smilex.telegram.message.bot.api.TelegramBot;
+import cn.smilex.telegram.message.bot.handler.TelegramBotChannelHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 /**
  * @author smilex
@@ -13,10 +16,20 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CommonBeanConfig {
     @Value("${telegram.bot.key}")
+    private String name;
+
+    @Value("${telegram.bot.key}")
     private String key;
 
     @Bean
-    public TelegramBot telegramBot() {
-        return new TelegramBot(this.key);
+    public TelegramBotChannelHandler telegramBotChannelHandler() {
+        return new TelegramBotChannelHandler(name, key);
+    }
+
+    @Bean
+    public TelegramBotsApi telegramBot(TelegramBotChannelHandler telegramBotChannelHandler) throws TelegramApiException {
+        TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+        telegramBotsApi.registerBot(telegramBotChannelHandler);
+        return telegramBotsApi;
     }
 }
