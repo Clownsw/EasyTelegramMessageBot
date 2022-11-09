@@ -1,5 +1,6 @@
 package cn.smilex.telegram.message.bot.handler;
 
+import cn.smilex.telegram.message.bot.handler.impl.AbstractTelegramMessageHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -13,10 +14,12 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class TelegramBotChannelHandler extends TelegramLongPollingBot {
     private final String botName;
     private final String botKey;
+    private final AbstractTelegramMessageHandler<Update> telegramMessageHandler;
 
-    public TelegramBotChannelHandler(String botName, String botKey) {
+    public TelegramBotChannelHandler(String botName, String botKey, AbstractTelegramMessageHandler<Update> telegramMessageHandler) {
         this.botName = botName;
         this.botKey = botKey;
+        this.telegramMessageHandler = telegramMessageHandler;
     }
 
     @Override
@@ -31,6 +34,10 @@ public class TelegramBotChannelHandler extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        log.info("{}", update.getMessage().getText());
+        try {
+            telegramMessageHandler.handle(update);
+        } catch (Exception e) {
+            log.error("", e);
+        }
     }
 }
