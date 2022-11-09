@@ -5,6 +5,7 @@ import cn.smilex.telegram.message.bot.handler.TelegramBotChannelHandler;
 import cn.smilex.telegram.message.bot.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -17,18 +18,26 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Service
 public class MessageServiceImpl implements MessageService {
     private TelegramBotChannelHandler telegramBotChannelHandler;
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Autowired
-    public void setChannelHandler(TelegramBotChannelHandler telegramBotChannelHandler) {
+    public void setTelegramBotChannelHandler(TelegramBotChannelHandler telegramBotChannelHandler) {
         this.telegramBotChannelHandler = telegramBotChannelHandler;
+    }
+
+    @Autowired
+    public void setThreadPoolTaskExecutor(ThreadPoolTaskExecutor threadPoolTaskExecutor) {
+        this.threadPoolTaskExecutor = threadPoolTaskExecutor;
     }
 
     @Override
     public void sendMessage(ReqSendMessage message) {
-        try {
-            telegramBotChannelHandler.execute(message.intoSendMessage());
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+        threadPoolTaskExecutor.submit(() -> {
+            try {
+                telegramBotChannelHandler.execute(message.intoSendMessage());
+            } catch (TelegramApiException e) {
+                log.error("", e);
+            }
+        });
     }
 }
