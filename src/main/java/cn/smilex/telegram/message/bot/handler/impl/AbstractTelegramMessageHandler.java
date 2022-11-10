@@ -15,6 +15,7 @@ public abstract class AbstractTelegramMessageHandler<T> implements TelegramMessa
 
     public AbstractTelegramMessageHandler() {
         this.first = new Node<>(null, null, null);
+        init();
     }
 
     public abstract void init();
